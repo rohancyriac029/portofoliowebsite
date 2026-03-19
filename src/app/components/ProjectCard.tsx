@@ -37,7 +37,7 @@ export default function ProjectCard({
         transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) ${isActive ? "translateY(-6px)" : "translateY(0)"}`,
         transition: isDragging
           ? "none"
-          : "transform 0.6s var(--ease-spring), border-color 0.3s ease",
+          : "transform 0.6s var(--ease-spring), border-color 0.3s ease, opacity 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease",
       }}
     >
       {/* Card top row */}

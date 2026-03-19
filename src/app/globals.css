@@ -13,6 +13,8 @@
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --font-mono:   'JetBrains Mono', monospace;
   --font-body:   'Space Grotesk', sans-serif;
+  --accent-gradient: linear-gradient(135deg, #e8ff47, #aaff00);
+  --glow-accent: 0 0 30px rgba(232,255,71,0.15);
 }
 
 *, *::before, *::after {
@@ -123,6 +125,7 @@ body {
 .btn-primary:hover {
   background: transparent;
   color: var(--accent);
+  box-shadow: 0 0 25px rgba(232,255,71,0.2), 0 0 60px rgba(232,255,71,0.08);
 }
 
 .btn-ghost {
@@ -135,6 +138,7 @@ body {
 .btn-ghost:hover {
   border-color: var(--border-hi);
   color: var(--text);
+  box-shadow: 0 0 20px rgba(232,255,71,0.1);
 }
 
 /* ─── Navigation ─────────────────────────────────── */
@@ -167,6 +171,7 @@ body {
   border: none;
   cursor: none;
   letter-spacing: -0.02em;
+  transition: transform 0.3s var(--ease-spring);
 }
 
 .nav-link {
@@ -179,13 +184,14 @@ body {
   border-bottom: 1px solid transparent;
   padding-bottom: 4px;
   cursor: none;
-  transition: color 0.22s ease, border-color 0.22s ease;
+  transition: color 0.22s ease, border-color 0.22s ease, transform 0.3s var(--ease-spring);
   color: var(--muted);
 }
 
 .nav-link.active {
   color: var(--text);
-  border-bottom-color: var(--accent);
+  border-bottom-color: transparent;
+  text-shadow: 0 0 12px rgba(232,255,71,0.3);
 }
 
 .nav-status {
@@ -226,6 +232,15 @@ body {
   border: 1px solid rgba(232, 255, 71, 0.2);
   padding: 0.2rem 0.6rem;
   border-radius: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  cursor: none;
+}
+
+.tag:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(232,255,71,0.25);
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 .tag-lg {
@@ -248,6 +263,12 @@ body {
 
 .card.active {
   border-color: rgba(232, 255, 71, 0.3);
+  box-shadow: 0 0 40px rgba(232,255,71,0.08), 0 0 80px rgba(232,255,71,0.04);
+}
+
+.card:not(.active) {
+  opacity: 0.5;
+  filter: blur(1.5px);
 }
 
 .card-index {
@@ -314,6 +335,16 @@ body {
   letter-spacing: 0.15em;
   color: var(--accent);
   margin-bottom: 0.85rem;
+}
+
+/* ─── Shelf Scroll ───────────────────────────────── */
+.shelf-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.shelf-scroll::-webkit-scrollbar {
+  display: none; /* Chrome / Safari */
 }
 
 /* ─── Shelf Controls ─────────────────────────────── */
@@ -440,6 +471,39 @@ body {
 .word-reveal.in-view {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ─── Section Morphing ───────────────────────────── */
+#about {
+  background: radial-gradient(ellipse at 20% 30%, rgba(232,255,71,0.04), transparent 55%);
+}
+
+#projects {
+  background: radial-gradient(ellipse at 80% 60%, rgba(232,255,71,0.03), transparent 50%);
+}
+
+#contact {
+  background: radial-gradient(ellipse at 30% 70%, rgba(232,255,71,0.05), transparent 50%);
+}
+
+/* ─── Nav Sliding Indicator ──────────────────────── */
+.nav-indicator {
+  position: absolute;
+  bottom: -4px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+  transition: left 0.35s var(--ease-spring), width 0.35s var(--ease-spring), opacity 0.25s ease;
+  box-shadow: 0 0 8px rgba(232,255,71,0.4);
+  pointer-events: none;
+}
+
+/* ─── Interactive Grid Canvas ────────────────────── */
+.grid-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* ─── Responsive ─────────────────────────────────── */

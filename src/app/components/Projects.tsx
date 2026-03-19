@@ -67,71 +67,33 @@ function useReveal(ref: React.RefObject<HTMLElement | null>) {
 }
 
 export default function Projects() {
-  const CARD_WIDTH = 416; // 400px + 16px gap
-  const maxOffset = -(projects.length - 1) * CARD_WIDTH;
+  const CARD_GAP = 24; // 1.5rem
+  const CARD_WIDTH = 400 + CARD_GAP;
 
-  const [shelfOffset, setShelfOffset] = useState(0);
   const [activeCard, setActiveCard] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartX = useRef(0);
-  const dragStartOffset = useRef(0);
   const shelfRef = useRef<HTMLDivElement>(null);
+  const projectsRef = useRef<HTMLElement>(null);
 
   const [cardTilts, setCardTilts] = useState<{ x: number; y: number }[]>(
     projects.map(() => ({ x: 0, y: 0 }))
   );
 
-  const projectsRef = useRef<HTMLElement>(null);
   useReveal(projectsRef);
 
-  const clampOffset = (v: number) => Math.max(maxOffset, Math.min(0, v));
-
-  /* ── Shelf drag ── */
-  const onShelfMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    dragStartX.current = e.clientX;
-    dragStartOffset.current = shelfOffset;
+  /* ── Click to focus + scroll into view ── */
+  const selectCard = (idx: number) => {
+    setActiveCard(idx);
+    shelfRef.current?.children[idx]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
   };
 
-  const onShelfMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const delta = e.clientX - dragStartX.current;
-    setShelfOffset(clampOffset(dragStartOffset.current + delta));
-  };
-
-  const onShelfMouseUp = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const delta = e.clientX - dragStartX.current;
-    const momentum = delta * 0.9;
-    const finalOffset = clampOffset(dragStartOffset.current + delta + momentum);
-    const snapped = Math.round(finalOffset / CARD_WIDTH) * CARD_WIDTH;
-    setShelfOffset(clampOffset(snapped));
-    setActiveCard(Math.abs(Math.round(clampOffset(snapped) / CARD_WIDTH)));
-  };
-
-  // Touch drag
-  const onTouchStart = (e: React.TouchEvent) => {
-    dragStartX.current = e.touches[0].clientX;
-    dragStartOffset.current = shelfOffset;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    const delta = e.touches[0].clientX - dragStartX.current;
-    setShelfOffset(clampOffset(dragStartOffset.current + delta));
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const delta = e.changedTouches[0].clientX - dragStartX.current;
-    const momentum = delta * 0.9;
-    const snapped =
-      Math.round(clampOffset(dragStartOffset.current + delta + momentum) / CARD_WIDTH) * CARD_WIDTH;
-    setShelfOffset(clampOffset(snapped));
-    setActiveCard(Math.abs(Math.round(clampOffset(snapped) / CARD_WIDTH)));
-  };
-
+  /* ── Navigate via arrows ── */
   const goToCard = (dir: number) => {
     const next = Math.max(0, Math.min(projects.length - 1, activeCard + dir));
-    setActiveCard(next);
-    setShelfOffset(-next * CARD_WIDTH);
+    selectCard(next);
   };
 
   /* ── Card tilt ── */
@@ -156,7 +118,7 @@ export default function Projects() {
     });
   };
 
-  const shelfProgress = Math.abs(shelfOffset) / Math.abs(maxOffset || 1);
+  const shelfProgress = projects.length > 1 ? activeCard / (projects.length - 1) : 0;
 
   return (
     <section id="projects" ref={projectsRef} className="section">
@@ -169,41 +131,36 @@ export default function Projects() {
         <span className="section-label">[ {projects.length} SELECTED WORKS ]</span>
       </div>
 
-      {/* Shelf */}
-      <div style={{ overflow: "hidden", perspective: "1000px" }}>
-        <div
-          ref={shelfRef}
-          onMouseDown={onShelfMouseDown}
-          onMouseMove={onShelfMouseMove}
-          onMouseUp={onShelfMouseUp}
-          onMouseLeave={onShelfMouseUp}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          style={{
-            display: "flex",
-            gap: "1.5rem",
-            transform: `translateX(${shelfOffset}px)`,
-            transition: isDragging ? "none" : "transform 0.5s var(--ease-spring)",
-            cursor: isDragging ? "grabbing" : "grab",
-            userSelect: "none",
-            width: "max-content",
-            transformStyle: "preserve-3d",
-          }}
-        >
-          {projects.map((project, idx) => (
+      {/* Scroll-snap shelf */}
+      <div
+        ref={shelfRef}
+        className="shelf-scroll"
+        style={{
+          display: "flex",
+          gap: "1.5rem",
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          padding: "2rem 0.5rem 2rem 0",
+          perspective: "1000px",
+        }}
+      >
+        {projects.map((project, idx) => (
+          <div
+            key={project.index}
+            style={{ scrollSnapAlign: "start", flexShrink: 0, cursor: "none" }}
+            onClick={() => selectCard(idx)}
+          >
             <ProjectCard
-              key={project.index}
               project={project}
               idx={idx}
               isActive={idx === activeCard}
               tilt={cardTilts[idx]}
-              isDragging={isDragging}
+              isDragging={false}
               onMouseMove={onCardMouseMove}
               onMouseLeave={onCardMouseLeave}
             />
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
       {/* Shelf controls */}

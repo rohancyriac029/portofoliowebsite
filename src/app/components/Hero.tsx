@@ -18,6 +18,16 @@ export default function Hero({ scrollTo }: HeroProps) {
   /* Canvas ref */
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  /* Parallax scroll */
+  const [scrollY, setScrollY] = useState(0);
+
+  /* ── Parallax scroll listener ── */
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   /* ── Typewriter ── */
   useEffect(() => {
     const currentWord = words[wordIndex];
@@ -115,14 +125,109 @@ export default function Hero({ scrollTo }: HeroProps) {
         overflow: "hidden",
       }}
     >
-      {/* Particle canvas */}
+      {/* Particle canvas — far layer */}
       <canvas
         ref={canvasRef}
-        style={{ position: "absolute", inset: 0, zIndex: 0 }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          transform: `translateY(${scrollY * 0.05}px)`,
+        }}
       />
 
+      {/* Parallax floating shapes — near layer */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 1,
+          transform: `translateY(${scrollY * 0.25}px)`,
+          pointerEvents: "none",
+        }}
+      >
+        {/* Outlined circle */}
+        <div
+          style={{
+            position: "absolute",
+            top: "15%",
+            right: "18%",
+            width: 60,
+            height: 60,
+            border: "1px solid rgba(232,255,71,0.12)",
+            borderRadius: "50%",
+          }}
+        />
+        {/* Cross */}
+        <div
+          style={{
+            position: "absolute",
+            top: "55%",
+            left: "6%",
+            width: 30,
+            height: 30,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: 0,
+              width: 1,
+              height: "100%",
+              background: "rgba(240,237,232,0.08)",
+              transform: "translateX(-50%)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: 0,
+              width: "100%",
+              height: 1,
+              background: "rgba(240,237,232,0.08)",
+              transform: "translateY(-50%)",
+            }}
+          />
+        </div>
+        {/* Diamond */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "28%",
+            right: "8%",
+            width: 35,
+            height: 35,
+            border: "1px solid rgba(240,237,232,0.06)",
+            transform: "rotate(45deg)",
+          }}
+        />
+        {/* Small circle */}
+        <div
+          style={{
+            position: "absolute",
+            top: "30%",
+            left: "30%",
+            width: 20,
+            height: 20,
+            border: "1px solid rgba(232,255,71,0.08)",
+            borderRadius: "50%",
+          }}
+        />
+      </div>
+
       {/* Content */}
-      <div className="hero-content" style={{ position: "relative", zIndex: 2, maxWidth: "70%" }}>
+      {/* Content — mid layer */}
+      <div
+        className="hero-content"
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: "70%",
+          transform: `translateY(${scrollY * 0.12}px)`,
+        }}
+      >
         {/* Eyebrow */}
         <div
           style={{
